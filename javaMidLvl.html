@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Fundamentals Quiz</title>
+    <style>
+        :root {
+            /* Vibrant, modern color palette */
+            --bg-color: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            --container-bg: #ffffff;
+            --primary-color: #0d47a1; /* Deep Blue */
+            --primary-hover: #1565c0;
+            --correct-color: #388e3c; /* Success Green */
+            --correct-hover: #2e7d32;
+            --wrong-color: #ef5350; /* Error Red */
+            --wrong-hover: #e53935;
+            --text-color: #263238; /* Dark Slate Gray */
+            --text-light: #546e7a;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            /* Using a web-safe font stack */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: var(--container-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            padding: 35px 45px;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        #progress-tracker {
+            color: var(--text-light);
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        #question-text {
+            color: var(--text-color);
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        #answers-container {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .answer-button {
+            width: 100%;
+            padding: 18px;
+            background-color: #f1f8ff;
+            color: var(--text-color);
+            border: 2px solid #bbdefb;
+            border-radius: 10px;
+            font-size: 1.1em;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            font-weight: 600;
+        }
+
+        .answer-button:not([disabled]):hover {
+            background-color: #e3f2fd;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-button.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-hover);
+        }
+
+        .answer-button.wrong {
+            background-color: var(--wrong-color);
+            color: white;
+            border-color: var(--wrong-hover);
+        }
+
+        #feedback-message {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin: 20px 0;
+            min-height: 25px;
+            color: var(--primary-color);
+        }
+
+        #next-button {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        #next-button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        #results {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Java Fundamentals Quiz</h1>
+        <div id="quiz-body">
+            <div id="progress-tracker"></div>
+            <h3 id="question-text"></h3>
+            <div id="answers-container"></div>
+            <div id="feedback-message"></div>
+            <button id="next-button">Next Question</button>
+        </div>
+        <div id="results" style="display: none;"></div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the primary purpose of the `abstract` keyword in a class declaration?",
+                answers: {
+                    a: "To prevent a class from being inherited.",
+                    b: "To force a subclass to provide an implementation for a method.",
+                    c: "To indicate that a class can only have one instance.",
+                    d: "To make the class static and accessible without an object."
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "What is the difference between `==` and the `.equals()` method in Java?",
+                answers: {
+                    a: "`==` compares the content of two objects, while `.equals()` compares their memory addresses.",
+                    b: "`==` compares memory addresses, while `.equals()` compares object content.",
+                    c: "Both compare memory addresses by default.",
+                    d: "Both compare the content of two objects by default."
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "What is a checked exception in Java?",
+                answers: {
+                    a: "An exception that can be ignored and does not need to be handled.",
+                    b: "An exception that must be handled by a `try-catch` block or declared in a `throws` clause.",
+                    c: "An exception that only occurs at runtime.",
+                    d: "An exception related to syntax errors in the code."
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "Which of the following data structures is guaranteed to store elements in the order they were inserted?",
+                answers: {
+                    a: "`HashSet`",
+                    b: "`HashMap`",
+                    c: "`ArrayList`",
+                    d: "`TreeSet`"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What is the correct way to make a variable a class variable (shared among all instances)?",
+                answers: {
+                    a: "Use the `final` keyword.",
+                    b: "Use the `public` keyword.",
+                    c: "Use the `static` keyword.",
+                    d: "Use the `volatile` keyword."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following keywords is used to prevent a class from being inherited?",
+                answers: {
+                    a: "`abstract`",
+                    b: "`private`",
+                    c: "`final`",
+                    d: "`static`"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What is the purpose of the `super` keyword?",
+                answers: {
+                    a: "To call a method in the same class.",
+                    b: "To refer to a subclass's object.",
+                    c: "To invoke the superclass's constructor or methods.",
+                    d: "To declare a static variable."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following is an example of an unchecked exception?",
+                answers: {
+                    a: "`IOException`",
+                    b: "`SQLException`",
+                    c: "`FileNotFoundException`",
+                    d: "`NullPointerException`"
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "What happens when you declare a variable with the `transient` keyword?",
+                answers: {
+                    a: "It cannot be modified after initialization.",
+                    b: "It will not be serialized when an object is written to a stream.",
+                    c: "It is visible only within the same package.",
+                    d: "It is a class-level variable."
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "In Java, which of the following provides synchronization for a block of code?",
+                answers: {
+                    a: "`private` keyword",
+                    b: "`synchronized` keyword",
+                    c: "`volatile` keyword",
+                    d: "`final` keyword"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "What is the default value of a local variable in Java?",
+                answers: {
+                    a: "0",
+                    b: "`null`",
+                    c: "`false`",
+                    d: "The local variable is not automatically initialized."
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "Which of the following is a key feature of an interface?",
+                answers: {
+                    a: "It can contain both implemented methods and abstract methods.",
+                    b: "It can be instantiated directly.",
+                    c: "It can extend another class.",
+                    d: "It can only contain method signatures and constant fields."
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "How do you create a custom exception in Java?",
+                answers: {
+                    a: "Extend the `RuntimeException` class.",
+                    b: "Implement the `Throwable` interface.",
+                    c: "Create a new class and declare it with the `exception` keyword.",
+                    d: "Extend the `Exception` or `RuntimeException` class."
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "Which collection class allows you to store unique elements in a sorted order?",
+                answers: {
+                    a: "`ArrayList`",
+                    b: "`LinkedHashSet`",
+                    c: "`HashSet`",
+                    d: "`TreeSet`"
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "What is the output of `System.out.println(10/3);`?",
+                answers: {
+                    a: "3.3333333",
+                    b: "3",
+                    c: "3.0",
+                    d: "A compile-time error."
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "What does the `finally` block in a `try-catch-finally` statement do?",
+                answers: {
+                    a: "It executes only if no exception is thrown.",
+                    b: "It executes only if an exception is thrown.",
+                    c: "It executes regardless of whether an exception is thrown or caught.",
+                    d: "It is used to declare a variable that is constant."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following statements is true about a `static` method?",
+                answers: {
+                    a: "It can access instance variables of the class.",
+                    b: "It must be overridden by all subclasses.",
+                    c: "It can be called without creating an instance of the class.",
+                    d: "It can access non-`static` methods directly."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What is the correct way to handle multiple exceptions of different types in a single `catch` block (Java 7+)?",
+                answers: {
+                    a: "Using the `throws` keyword.",
+                    b: "Separating the exception types with a comma, e.g., `catch (ExceptionA, ExceptionB e)`.",
+                    c: "Using the pipe character (`|`), e.g., `catch (ExceptionA | ExceptionB e)`.",
+                    d: "It is not possible to catch multiple exceptions in one block."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following is true about a `private` constructor?",
+                answers: {
+                    a: "It prevents a class from being inherited.",
+                    b: "It is used to create a class that can only be instantiated within the same package.",
+                    c: "It prevents the class from being instantiated from outside the class itself.",
+                    d: "It is used to create a static class."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What does the `public` access modifier mean?",
+                answers: {
+                    a: "The member is accessible only from within the same class.",
+                    b: "The member is accessible only from within the same package.",
+                    c: "The member is accessible from anywhere.",
+                    d: "The member is accessible only from subclasses."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What is the purpose of the `Comparable` interface?",
+                answers: {
+                    a: "To define a contract for sorting a collection of objects.",
+                    b: "To allow objects to be compared for equality.",
+                    c: "To make a class immutable.",
+                    d: "To indicate that a class can be cloned."
+                },
+                correctAnswer: "a"
+            },
+            {
+                question: "Which of the following is a non-static inner class that has access to all the members of its outer class?",
+                answers: {
+                    a: "A nested class.",
+                    b: "A static nested class.",
+                    c: "An anonymous class.",
+                    d: "A member inner class."
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "What is the difference between a `Thread` and a `Runnable`?",
+                answers: {
+                    a: "A `Thread` is a class, while a `Runnable` is an interface.",
+                    b: "A `Thread` can be executed, but a `Runnable` cannot.",
+                    c: "A `Runnable` can be instantiated, but a `Thread` cannot.",
+                    d: "A `Runnable` can be started directly, while a `Thread` cannot."
+                },
+                correctAnswer: "a"
+            },
+            {
+                question: "What does the keyword `final` do when applied to a method?",
+                answers: {
+                    a: "It makes the method `static`.",
+                    b: "It prevents the method from being overridden by a subclass.",
+                    c: "It ensures the method always returns the same value.",
+                    d: "It makes the method accessible only from subclasses."
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "What is the term for a class that contains one or more `abstract` methods?",
+                answers: {
+                    a: "A final class.",
+                    b: "A private class.",
+                    c: "An abstract class.",
+                    d: "A static class."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following is true about garbage collection in Java?",
+                answers: {
+                    a: "It must be triggered manually by the programmer.",
+                    b: "It is a process that removes all unused objects from memory.",
+                    c: "It is a process that removes all objects from memory when the program ends.",
+                    d: "It is an automatic process that reclaims memory from objects that are no longer referenced."
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "What is the primary purpose of the `Set` interface in the Java Collections Framework?",
+                answers: {
+                    a: "To store elements in key-value pairs.",
+                    b: "To store a list of elements in a specific order.",
+                    c: "To store a collection of unique elements.",
+                    d: "To store elements in a sorted order."
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What does the `private` access modifier do?",
+                answers: {
+                    a: "It makes a member accessible from within the same package.",
+                    b: "It makes a member accessible from within the same class.",
+                    c: "It makes a member accessible from anywhere.",
+                    d: "It makes a member accessible only from subclasses."
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "What is method overloading?",
+                answers: {
+                    a: "When a subclass provides a specific implementation for a method of its superclass.",
+                    b: "When a class has multiple methods with the same name but different parameters.",
+                    c: "When a class has multiple methods with the same name and same parameters.",
+                    d: "When a class's method is declared as `static`."
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "Which of the following is an example of encapsulation?",
+                answers: {
+                    a: "A class extending another class.",
+                    b: "A class having multiple methods with the same name.",
+                    c: "Making instance variables `private` and providing `public` getter and setter methods.",
+                    d: "Creating a `static` method that can be called without an object."
+                },
+                correctAnswer: "c"
+            }
+        ];
+
+        const quizBody = document.getElementById('quiz-body');
+        const questionText = document.getElementById('question-text');
+        const answersContainer = document.getElementById('answers-container');
+        const nextButton = document.getElementById('next-button');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const resultsContainer = document.getElementById('results');
+        const progressTracker = document.getElementById('progress-tracker');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let questionOrder = Array.from({length: quizData.length}, (_, i) => i);
+
+        const correctMessages = [
+            "Correct! That's a bytecode-perfect answer!",
+            "Right on! You've successfully compiled that answer.",
+            "Awesome! Your code is clean and your answer is right.",
+            "You got it! That's a solid method.",
+            "Perfect! You're clearly not running on Java 1.0."
+        ];
+        
+        const wrongMessages = [
+            "Whoops! Looks like that answer threw an exception.",
+            "Wrong! That's not the code you're looking for...",
+            "Incorrect! Time for a bug fix.",
+            "Not quite! A little syntax error there.",
+            "Ouch! Did you forget a semicolon?"
+        ];
+
+        // Shuffle the questions to make the quiz different each time
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        shuffleArray(questionOrder);
+
+        function shuffleAnswers(answers) {
+            for (let i = answers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [answers[i], answers[j]] = [answers[j], answers[i]];
+            }
+            return answers;
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex < quizData.length) {
+                const questionIndex = questionOrder[currentQuestionIndex];
+                const currentQuestion = quizData[questionIndex];
+
+                progressTracker.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+                questionText.textContent = currentQuestion.question;
+                answersContainer.innerHTML = '';
+                feedbackMessage.textContent = '';
+                nextButton.style.display = 'none';
+
+                const answerLetters = Object.keys(currentQuestion.answers);
+                const shuffledAnswers = shuffleAnswers(answerLetters);
+
+                shuffledAnswers.forEach(letter => {
+                    const button = document.createElement('button');
+                    button.classList.add('answer-button');
+                    button.textContent = `${letter.toUpperCase()}. ${currentQuestion.answers[letter]}`;
+                    button.dataset.answer = letter;
+                    answersContainer.appendChild(button);
+                });
+
+                document.querySelectorAll('.answer-button').forEach(button => {
+                    button.addEventListener('click', handleAnswer);
+                });
+            } else {
+                showResults();
+            }
+        }
+
+        function handleAnswer(event) {
+            const selectedButton = event.target;
+            const selectedAnswer = selectedButton.dataset.answer;
+            const questionIndex = questionOrder[currentQuestionIndex];
+            const currentQuestion = quizData[questionIndex];
+
+            // Remove any previous wrong colors
+            document.querySelectorAll('.answer-button').forEach(button => {
+                button.classList.remove('wrong');
+            });
+
+            if (selectedAnswer === currentQuestion.correctAnswer) {
+                selectedButton.classList.add('correct');
+                feedbackMessage.textContent = correctMessages[Math.floor(Math.random() * correctMessages.length)];
+                score++;
+                
+                // Disable all buttons and show next button
+                document.querySelectorAll('.answer-button').forEach(button => {
+                    button.disabled = true;
+                });
+                nextButton.style.display = 'block';
+
+            } else {
+                selectedButton.classList.add('wrong');
+                feedbackMessage.textContent = wrongMessages[Math.floor(Math.random() * wrongMessages.length)];
+            }
+        }
+
+        function showResults() {
+            quizBody.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            resultsContainer.textContent = `Quiz Finished! You got ${score} out of ${quizData.length} correct.`;
+        }
+
+        nextButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+            showQuestion();
+        });
+
+        // Initial call to start the quiz
+        showQuestion();
+    </script>
+</body>
+</html>

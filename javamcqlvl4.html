@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Java Mid-Level Quiz - OOPS Concepts</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(120deg, #289672 0%, #6a82fb 100%);
+      color: #222d3b;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .quiz-container {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(45, 58, 83, 0.18);
+      max-width: 600px;
+      width: 95%;
+      padding: 32px 24px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .question {
+      font-weight: 500;
+      font-size: 1.25em;
+      margin-bottom: 18px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .option {
+      padding: 13px 18px;
+      border: 2px solid #b8e994;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #d3ffe8;
+      color: #2d3a4a;
+      font-size: 1em;
+      transition: background 0.2s, border 0.2s, color 0.2s;
+      user-select: none;
+    }
+    .option:hover:not(:disabled) {
+      background: #a259d9;
+      color: #fff;
+      border-color: #a259d9;
+    }
+    .option.correct {
+      background-color: #4caf50 !important;
+      color: white;
+      border-color: #4caf50 !important;
+      cursor: default;
+    }
+    .option.wrong {
+      background-color: #f44336 !important;
+      color: white;
+      border-color: #f44336 !important;
+      cursor: default;
+    }
+    .result {
+      font-size: 1.35em;
+      color: #47a386;
+      margin: 16px 0;
+      display: none;
+    }
+    .restart-btn, .next-btn {
+      background: #47a386;
+      color: #fff;
+      border: none;
+      padding: 11px 22px;
+      font-size: 1.05em;
+      border-radius: 9px;
+      cursor: pointer;
+      margin-top: 16px;
+      display: none;
+      transition: background 0.2s;
+    }
+    .restart-btn:hover, .next-btn:hover {
+      background-color: #a259d9;
+    }
+    .next-btn.active {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="question"></div>
+    <div class="options"></div>
+    <div class="result">Your score: <span id="score">0</span></div>
+    <button class="next-btn">Next</button>
+    <button class="restart-btn">Restart Quiz</button>
+  </div>
+<script>
+const quizData = [
+  {
+    question: "What is the main principle of Object-Oriented Programming?",
+    options: [
+      "Procedural programming",
+      "Encapsulation",
+      "Functional programming",
+      "Structured programming"
+    ],
+    answer: "Encapsulation"
+  },
+  {
+    question: "Which of these is NOT a pillar of OOPS?",
+    options: [
+      "Inheritance",
+      "Abstraction",
+      "Polymorphism",
+      "Compilation"
+    ],
+    answer: "Compilation"
+  },
+  {
+    question: "What keyword is used to inherit a class in Java?",
+    options: [
+      "extends",
+      "implements",
+      "inherits",
+      "super"
+    ],
+    answer: "extends"
+  },
+  {
+    question: "What is method overloading?",
+    options: [
+      "Methods with same name but different return type",
+      "Methods with same name but different parameters",
+      "Methods overridden in child class",
+      "Methods with different names doing same task"
+    ],
+    answer: "Methods with same name but different parameters"
+  },
+  {
+    question: "Which of these is TRUE about an abstract class?",
+    options: [
+      "It cannot have any methods",
+      "It must be instantiated",
+      "It can have abstract and concrete methods",
+      "It cannot have variables"
+    ],
+    answer: "It can have abstract and concrete methods"
+  },
+  {
+    question: "Which access modifier allows access only within the same package?",
+    options: [
+      "private",
+      "protected",
+      "default",
+      "public"
+    ],
+    answer: "default"
+  },
+  {
+    question: "What is polymorphism?",
+    options: [
+      "One object multiple classes",
+      "Ability of an object to take many forms",
+      "Method that never changes",
+      "Variable that never changes"
+    ],
+    answer: "Ability of an object to take many forms"
+  },
+  {
+    question: "What is encapsulation?",
+    options: [
+      "Wrapping data and methods together",
+      "Hiding data with private access",
+      "Creating subclasses from superclasses",
+      "Separating interface from implementation"
+    ],
+    answer: "Wrapping data and methods together"
+  },
+  {
+    question: "Which keyword refers to the current object in a method or constructor?",
+    options: [
+      "super",
+      "this",
+      "self",
+      "current"
+    ],
+    answer: "this"
+  },
+  {
+    question: "What does the 'super' keyword refer to?",
+    options: [
+      "Current class instance",
+      "Parent class instance",
+      "Static variables",
+      "Global variables"
+    ],
+    answer: "Parent class instance"
+  },
+  {
+    question: "Which of these methods cannot be overridden?",
+    options: [
+      "final methods",
+      "private methods",
+      "static methods",
+      "All of the above"
+    ],
+    answer: "All of the above"
+  },
+  {
+    question: "When multiple methods have the same name and parameter types, but in different classes, this is called?",
+    options: [
+      "Overloading",
+      "Overriding",
+      "Hiding",
+      "Shadowing"
+    ],
+    answer: "Overriding"
+  },
+  {
+    question: "Which of the following is TRUE for interfaces in Java before Java 8?",
+    options: [
+      "Can contain method bodies",
+      "Can contain only abstract methods",
+      "Can have instance variables",
+      "Can be instantiated"
+    ],
+    answer: "Can contain only abstract methods"
+  },
+  {
+    question: "What is a constructor in Java?",
+    options: [
+      "Method to destroy objects",
+      "Special method to initialize objects",
+      "Method to copy objects",
+      "Method that returns class name"
+    ],
+    answer: "Special method to initialize objects"
+  },
+  {
+    question: "Can a Java class extend multiple classes?",
+    options: [
+      "Yes",
+      "No",
+      "Yes, with interfaces",
+      "Only abstract classes"
+    ],
+    answer: "No"
+  },
+  {
+    question: "Which of the following is FALSE about static methods?",
+    options: [
+      "Can be called without objects",
+      "Cannot access instance variables directly",
+      "Can be overridden",
+      "Belongs to the class"
+    ],
+    answer: "Can be overridden"
+  },
+  {
+    question: "What does it mean if a class is declared 'final'?",
+    options: [
+      "Cannot have subclasses",
+      "Can only have static methods",
+      "Cannot create objects of it",
+      "Must override all methods"
+    ],
+    answer: "Cannot have subclasses"
+  },
+  {
+    question: "Which statement about Java interfaces is correct?",
+    options: [
+      "Interfaces cannot extend other interfaces",
+      "A class can implement multiple interfaces",
+      "Interfaces can contain constructors",
+      "Interfaces can have instance variables"
+    ],
+    answer: "A class can implement multiple interfaces"
+  },
+  {
+    question: "What is the default value of an object reference in Java?",
+    options: [
+      "0",
+      "null",
+      "undefined",
+      "empty string"
+    ],
+    answer: "null"
+  },
+  {
+    question: "Which OOPS concept helps to reduce complexity by hiding details?",
+    options: [
+      "Encapsulation",
+      "Abstraction",
+      "Inheritance",
+      "Polymorphism"
+    ],
+    answer: "Abstraction"
+  },
+  {
+    question: "Which of these is NOT an example of inheritance?",
+    options: [
+      "Single inheritance",
+      "Multiple inheritance using classes",
+      "Multiple inheritance using interfaces",
+      "Multilevel inheritance"
+    ],
+    answer: "Multiple inheritance using classes"
+  },
+  {
+    question: "Which keyword is used to refer to a parent class constructor?",
+    options: [
+      "this()",
+      "super()",
+      "parent()",
+      "base()"
+    ],
+    answer: "super()"
+  },
+  {
+    question: "Can interfaces have static methods (from Java 8 onwards)?",
+    options: [
+      "Yes",
+      "No",
+      "Only default methods",
+      "Only private methods"
+    ],
+    answer: "Yes"
+  },
+  {
+    question: "Which of these is true about method overriding?",
+    options: [
+      "The method signature must be different",
+      "The return type can differ arbitrarily",
+      "The access level cannot be more restrictive",
+      "Only private methods can be overridden"
+    ],
+    answer: "The access level cannot be more restrictive"
+  },
+  {
+    question: "What is the access level of protected members?",
+    options: [
+      "Accessible only inside the same class",
+      "Accessible within package and subclasses",
+      "Accessible everywhere",
+      "Only accessible within package"
+    ],
+    answer: "Accessible within package and subclasses"
+  },
+  {
+    question: "What is runtime polymorphism in Java?",
+    options: [
+      "Method overloading",
+      "Method overriding",
+      "Operator overloading",
+      "None of these"
+    ],
+    answer: "Method overriding"
+  },
+  {
+    question: "Which of the following cannot be used to instantiate an interface?",
+    options: [
+      "Anonymous class",
+      "Concrete class implementing interface",
+      "Direct interface instantiation",
+      "Lambda expression"
+    ],
+    answer: "Direct interface instantiation"
+  },
+  {
+    question: "What happens if a class does not implement all methods of an interface?",
+    options: [
+      "Compile error unless declared abstract",
+      "Automatically implements methods with default behavior",
+      "It compiles fine",
+      "Runtime error"
+    ],
+    answer: "Compile error unless declared abstract"
+  },
+  {
+    question: "What type of relationship does inheritance represent?",
+    options: [
+      "Is-a",
+      "Has-a",
+      "Uses-a",
+      "Depends-on"
+    ],
+    answer: "Is-a"
+  },
+  {
+    question: "Which access modifier gives widest accessibility?",
+    options: [
+      "private",
+      "protected",
+      "public",
+      "default"
+    ],
+    answer: "public"
+  },
+  {
+    question: "What is an interface in Java?",
+    options: [
+      "Class normal with extended features",
+      "Template for a class with abstract methods",
+      "Primitive type",
+      "Variable"
+    ],
+    answer: "Template for a class with abstract methods"
+  },
+  {
+    question: "Which is NOT true about constructors?",
+    options: [
+      "A constructor can be overridden",
+      "A constructor has the same name as the class",
+      "A constructor has no return type",
+      "Constructor is called when object is created"
+    ],
+    answer: "A constructor can be overridden"
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+const questionEl = document.querySelector('.question');
+const optionsEl = document.querySelector('.options');
+const resultEl = document.querySelector('.result');
+const scoreEl = document.getElementById('score');
+const restartBtn = document.querySelector('.restart-btn');
+const nextBtn = document.querySelector('.next-btn');
+let answeredCorrectly = false;
+
+function loadQuestion() {
+  if (currentQuestion >= quizData.length) {
+    endQuiz();
+    return;
+  }
+  answeredCorrectly = false;
+  nextBtn.style.display = 'none';
+  const currentQuiz = quizData[currentQuestion];
+  questionEl.textContent = `Q${currentQuestion + 1}. ${currentQuiz.question}`;
+  optionsEl.innerHTML = '';
+  currentQuiz.options.forEach(option => {
+    const button = document.createElement('button');
+    button.classList.add('option');
+    button.textContent = option;
+    button.disabled = false;
+    button.classList.remove('correct', 'wrong');
+    button.onclick = () => handleAnswer(button, option);
+    optionsEl.appendChild(button);
+  });
+}
+
+function handleAnswer(button, selectedOption) {
+  if (answeredCorrectly) return;
+  const correct = quizData[currentQuestion].answer;
+  if (selectedOption === correct) {
+    answeredCorrectly = true;
+    button.classList.add('correct');
+    score++;
+    disableOptions();
+    nextBtn.style.display = 'inline-block';
+  } else {
+    button.classList.add('wrong');
+    button.disabled = true;
+  }
+}
+
+function disableOptions() {
+  const optionButtons = document.querySelectorAll('.option');
+  optionButtons.forEach(button => button.disabled = true);
+}
+
+function endQuiz() {
+  questionEl.style.display = 'none';
+  optionsEl.style.display = 'none';
+  nextBtn.style.display = 'none';
+  resultEl.style.display = 'block';
+  scoreEl.textContent = score;
+  restartBtn.style.display = 'inline-block';
+}
+
+nextBtn.addEventListener('click', () => {
+  currentQuestion++;
+  loadQuestion();
+});
+
+restartBtn.addEventListener('click', () => {
+  currentQuestion = 0;
+  score = 0;
+  questionEl.style.display = 'block';
+  optionsEl.style.display = 'flex';
+  resultEl.style.display = 'none';
+  nextBtn.style.display = 'none';
+  restartBtn.style.display = 'none';
+  loadQuestion();
+});
+
+loadQuestion();
+</script>
+</body>
+</html>

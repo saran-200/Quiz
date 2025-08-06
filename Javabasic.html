@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Java Basics Quiz</title>
+    <style>
+        body {
+            background: #f5f8fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .quiz-container {
+            background: #fff;
+            max-width: 650px;
+            margin: 40px auto;
+            box-shadow: 0 0 15px #ccc;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        h1 {
+            color: #395886;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .question {
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .options label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+            padding-left: 5px;
+        }
+        .feedback {
+            margin: 15px 0 10px 0;
+            font-size: 1.08em;
+            font-weight: 600;
+            border-radius: 6px;
+            padding: 12px;
+        }
+        .feedback.correct {
+            color: #1b6832;
+            background: #e7f6ea;
+            border-left: 6px solid #33b249;
+        }
+        .feedback.incorrect {
+            color: #931840;
+            background: #fbeaed;
+            border-left: 6px solid #e94e77;
+        }
+        .explanation {
+            font-size: 0.96em;
+            color: #395886;
+            margin-top: 8px;
+        }
+        button {
+            background: #395886;
+            color: #fff;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 18px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:disabled {
+            background: #bbc5d0;
+            cursor: default;
+        }
+        #result {
+            margin-top: 30px;
+            font-size: 1.25rem;
+            text-align: center;
+            color: #3c763d;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Java Basics Quiz</h1>
+        <div id="quiz"></div>
+        <button id="next" onclick="nextQuestion()" disabled>Next</button>
+        <div id="result"></div>
+    </div>
+    <script>
+        const questions = [
+            {
+                question: "What is the correct way to declare a variable in Java?",
+                options: ["var num = 10;", "int num = 10;", "num = 10;", "integer num = 10;"],
+                answer: 1,
+                explanation: "Java is statically typed. You specify type, then variable: <code>int num = 10;</code>."
+            },
+            {
+                question: "Which data type is used to store a single character?",
+                options: ["char", "string", "Character", "text"],
+                answer: 0,
+                explanation: "<code>char</code> is the primitive data type for a single character in Java."
+            },
+            {
+                question: "How do you create a single-line comment in Java?",
+                options: ["// This is a comment", "# This is a comment", "<!-- This is a comment -->", "' This is a comment"],
+                answer: 0,
+                explanation: "Single-line comments in Java use <code>//</code>."
+            },
+            {
+                question: "What is the size of an int variable in Java?",
+                options: ["2 bytes", "4 bytes", "8 bytes", "16 bytes"],
+                answer: 1,
+                explanation: "<code>int</code> takes 4 bytes (32 bits) in Java."
+            },
+            {
+                question: "Which loop is guaranteed to execute at least once?",
+                options: ["for", "while", "do-while", "none"],
+                answer: 2,
+                explanation: "<code>do-while</code> loop executes its body once before checking the condition."
+            },
+            {
+                question: "How do you start an array of 5 integers in Java?",
+                options: ["int arr[] = new int[5];", "array arr[5];", "int arr = [5];", "int arr = new int[5];"],
+                answer: 0,
+                explanation: "The syntax <code>int arr[] = new int[5];</code> correctly creates an int array of 5 elements."
+            },
+            {
+                question: "What is the default value of a boolean variable in Java?",
+                options: ["true", "false", "null", "0"],
+                answer: 1,
+                explanation: "Boolean variables are defaulted to <code>false</code>."
+            },
+            {
+                question: "Which keyword is used to define a class in Java?",
+                options: ["define", "struct", "class", "object"],
+                answer: 2,
+                explanation: "Classes are defined using the <code>class</code> keyword."
+            },
+            {
+                question: "How do you access the third element in an array arr?",
+                options: ["arr[2]", "arr(3)", "arr[3]", "arr{2}"],
+                answer: 0,
+                explanation: "Array indices start from 0. Third element = <code>arr[2]</code>."
+            },
+            {
+                question: "Which of these is NOT a primitive data type in Java?",
+                options: ["int", "float", "String", "double"],
+                answer: 2,
+                explanation: "<code>String</code> is a class, not a primitive type."
+            },
+            // more questions (add up to 25 as in previous code)
+            {
+                question: "Which operator is used for multiplication in Java?",
+                options: ["^", "*", "x", "%"],
+                answer: 1,
+                explanation: "The <code>*</code> symbol is the multiplication operator."
+            },
+            {
+                question: "Which method is the entry point for a Java program?",
+                options: ["start()", "run()", "main()", "init()"],
+                answer: 2,
+                explanation: "Every Java application starts with <code>public static void main(String[] args)</code>."
+            },
+            {
+                question: "Which of the following is a valid identifier in Java?",
+                options: ["2value", "_value", "value$", "value-1"],
+                answer: 1,
+                explanation: "Identifiers can't begin with a digit or have '-', but '_' and '$' are allowed."
+            },
+            {
+                question: "What will be the value of x after: int x = 5; x += 3;",
+                options: ["8", "2", "15", "53"],
+                answer: 0,
+                explanation: "x += 3 is shorthand for x = x + 3, so value is 8."
+            },
+            {
+                question: "Which of these keywords is used to inherit a class?",
+                options: ["this", "base", "extends", "implements"],
+                answer: 2,
+                explanation: "<code>extends</code> is used to inherit a class."
+            },
+            {
+                question: "Select the correct array declaration.",
+                options: ["int arr = int[5];", "int arr[] = new int[5];", "arr = [5]int;", "array arr[5];"],
+                answer: 1,
+                explanation: "<code>int arr[] = new int[5];</code> is a valid declaration."
+            },
+            {
+                question: "What is the index of the first element in a Java array?",
+                options: ["0", "1", "-1", "Depends on array"],
+                answer: 0,
+                explanation: "All Java arrays start with index 0."
+            },
+            {
+                question: "Which symbol is used to end a statement in Java?",
+                options: [".", ",", ";", ":"],
+                answer: 2,
+                explanation: "Statements end with a <code>;</code>."
+            },
+            {
+                question: "What is the output of: System.out.println(10 / 3);",
+                options: ["3.333", "3", "3.0", "Error"],
+                answer: 1,
+                explanation: "Both operands are <code>int</code>, so result is integer division: 3."
+            },
+            {
+                question: "Which access modifier makes a variable only accessible within its class?",
+                options: ["public", "private", "protected", "final"],
+                answer: 1,
+                explanation: "<code>private</code> restricts access to the same class."
+            },
+            {
+                question: "What does JVM stand for?",
+                options: ["Java Variable Manipulator", "Java Virtual Machine", "Java Vendor Module", "Java Variant Model"],
+                answer: 1,
+                explanation: "JVM stands for Java Virtual Machine."
+            },
+            {
+                question: "What is the default value of int array elements in Java?",
+                options: ["null", "0", "1", "undefined"],
+                answer: 1,
+                explanation: "Default value for each int array element is 0."
+            },
+            {
+                question: "Which data type is NOT a numeric type?",
+                options: ["int", "double", "float", "boolean"],
+                answer: 3,
+                explanation: "boolean is logical (true/false), not numeric."
+            },
+            {
+                question: "Which one is a correct while loop syntax?",
+                options: ["while(x < 10) { }", "while x < 10 { }", "while (x < 10);", "while x < 10:"],
+                answer: 0,
+                explanation: "<code>while(condition) { }</code> is correct syntax in Java."
+            },
+            {
+                question: "How do you assign a value 7 to 3rd element of int[] arr?",
+                options: ["arr[2] = 7;", "arr(3) = 7;", "arr[3] == 7;", "arr{2} = 7;"],
+                answer: 0,
+                explanation: "Arrays start from zero: arr[2] = 7 assigns to the third element."
+            },
+            {
+                question: "Arrays in Java are:",
+                options: ["Objects", "Primitive types", "Functions", "None"],
+                answer: 0,
+                explanation: "Arrays are objects in Java, not primitives."
+            },
+            {
+                question: "The 'break' statement is used to:",
+                options: ["Continue loop", "Exit loop", "End program", "Declare variables"],
+                answer: 1,
+                explanation: "<code>break</code> exits a loop or switch."
+            },
+            {
+                question: "Which of these is correct to create a char array of 4 elements?",
+                options: ["char arr[4];", "char[] arr = new char[4];", "arr = char[4];", "char arr = new char(4);"],
+                answer: 1,
+                explanation: "<code>char[] arr = new char[4];</code> correctly declares and creates the array."
+            },
+            {
+                question: "Which method prints output to the console?",
+                options: ["System.print()", "Output.print()", "System.out.println()", "console.log()"],
+                answer: 2,
+                explanation: "Console output in Java is <code>System.out.println()</code>."
+            },
+            {
+                question: "How do you take input from the user in Java?",
+                options: ["Scanner", "input()", "cin", "Console"],
+                answer: 0,
+                explanation: "The <code>Scanner</code> class enables user input."
+            },
+            {
+                question: "Which keyword declares a constant variable?",
+                options: ["const", "let", "final", "constvar"],
+                answer: 2,
+                explanation: "Variables with <code>final</code> are constant and can't be changed."
+            },
+            {
+                question: "What is the result type of 5 + 3.0 in Java?",
+                options: ["int", "float", "double", "String"],
+                answer: 2,
+                explanation: "<code>3.0</code> is a double, so result is double."
+            },
+            {
+                question: "Which symbol is used to comment code in multiple lines?",
+                options: ["//", "/* */", "#", "<!-- -->"],
+                answer: 1,
+                explanation: "Multi-line comments: <code>/* ... */</code>."
+            },
+            {
+                question: "What is the length of array arr defined as int[] arr = {10,20,30,40};",
+                options: ["3", "4", "5", "Undefined"],
+                answer: 1,
+                explanation: "There are 4 elements so arr.length = 4."
+            },
+            {
+                question: "Which of these can store decimal values?",
+                options: ["int", "boolean", "float", "char"],
+                answer: 2,
+                explanation: "<code>float</code> stores decimal (floating point) values."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let score = 0;
+
+        function loadQuestion(index) {
+            const quizDiv = document.getElementById("quiz");
+            const q = questions[index];
+
+            let html = `<div class='question'>Question ${index + 1} of ${questions.length}:<br>${q.question}</div>`;
+            html += `<div class='options'>`;
+            q.options.forEach((option, i) => {
+                html += `<label>
+                            <input type="radio" name="option" value="${i}" onclick="handleOptionClick(${i})"
+                              ${userAnswers[index] !== undefined ? "disabled" : ""}/>
+                            ${option}
+                         </label>`;
+            });
+            html += `</div>`;
+            html += `<div id="feedback"></div>`;
+            quizDiv.innerHTML = html;
+
+            document.getElementById("next").disabled = true;
+        }
+
+        function handleOptionClick(selected) {
+            if (userAnswers[currentQuestion] !== undefined) return; // Prevent double answer
+
+            const q = questions[currentQuestion];
+            userAnswers[currentQuestion] = selected;
+
+            let correct = selected === q.answer;
+            if (correct) score++;
+
+            let feedbackDiv = document.getElementById("feedback");
+            feedbackDiv.innerHTML =
+                `<div class="feedback ${correct ? "correct" : "incorrect"}">` +
+                (correct ? "Correct!" : "Incorrect.") +
+                `</div>
+                <div class='explanation'>${q.explanation}</div>`;
+
+            // Disable all radios for this question
+            let radios = document.getElementsByName("option");
+            radios.forEach(r => r.disabled = true);
+
+            // Enable "Next" or show result
+            if (currentQuestion < questions.length - 1) {
+                document.getElementById("next").disabled = false;
+                document.getElementById("next").innerText = "Next";
+            } else {
+                document.getElementById("next").disabled = false;
+                document.getElementById("next").innerText = "Show Result";
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion(currentQuestion);
+            } else {
+                // Quiz finished, show score
+                document.getElementById("quiz").style.display = "none";
+                document.getElementById("next").style.display = "none";
+                document.getElementById("result").innerHTML =
+                    `<b>Quiz Completed!</b><br><br>Your Score: <b>${score} / ${questions.length}</b>`;
+            }
+        }
+
+        window.onload = () => loadQuestion(currentQuestion);
+    </script>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🤣 Core Java Quiz Show! 🤩</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+    body {
+      font-family: 'Comic Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ffefba, #ffc3a0 60%, #ffa5d8 100%);
+      min-height: 100vh;
+    }
+    .quiz-container {
+      background: rgba(255,255,255,0.95);
+      padding: 32px 24px;
+      border-radius: 16px;
+      max-width: 750px;
+      margin: 50px auto;
+      box-shadow: 0 5px 25px #fd74cd80, 0 0 0 10px #ffe3e3;
+      position: relative;
+    }
+    h2 {
+      text-align: center;
+      font-size: 2.4em;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #f7971e 10%, #ffd200 60%, #21d4fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    #question-number {
+      font-size: 1.3em;
+      color: #fa69e4;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #question-number::before {
+      content: "🐵";
+      font-size: 1.1em;
+      vertical-align: middle;
+    }
+    pre {
+      background: #fff7e6;
+      color: #fd5e53;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'Fira Mono', 'Courier New', Courier, monospace;
+      font-size: 1.05em;
+      box-shadow: 0 2px 8px #fd74cd45;
+      margin: 6px 0 12px 0;
+      white-space: pre-wrap;
+    }
+    .options label {
+      display: block;
+      margin: 10px 0;
+      background: linear-gradient(90deg, #feecd0 65%, #b0fabf 100%);
+      border-radius: 7px;
+      padding: 8px 12px;
+      font-size: 1.17em;
+      transition: background 0.25s, box-shadow 0.2s, transform 0.2s;
+      cursor: pointer;
+      box-shadow: 0 2px 4px #f7971e30;
+      user-select: none;
+    }
+    .options label:hover {
+      background: linear-gradient(90deg, #faecd7 60%, #f7c9f3 100%);
+      box-shadow: 0 6px 18px #fc59a350;
+      transform: scale(1.04) rotate(-1deg);
+    }
+    .btn {
+      margin: 12px 12px 0 0;
+      padding: 8px 22px;
+      font-size: 1.15em;
+      border: none;
+      background: linear-gradient(90deg, #ffdb85 10%, #86e6fa 90%);
+      color: #ed56b1;
+      border-radius: 7px;
+      font-family: 'Comic Neue', Arial, sans-serif;
+      box-shadow: 0 4px 12px #85ffd480;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.13s, background 0.2s;
+      user-select: none;
+    }
+    .btn:active {
+      background: linear-gradient(90deg, #ffd700 30%, #ffc8b1 100%);
+      transform: scale(0.98);
+    }
+    .btn:disabled {
+      color: #8a9296;
+      background: #f6f7f8;
+      cursor: default;
+    }
+    #result {
+      margin: 16px 0;
+      font-weight: bold;
+      min-height: 34px;
+      font-size: 1.25em;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    #result span {
+      font-size: 2em;
+      transition: all 0.18s;
+    }
+    #explanation {
+      display: none;
+      margin-top: 12px;
+      background: #eafbf3;
+      border: 2px dashed #14d6b1a6;
+      color: #008873;
+      padding: 14px;
+      border-radius: 7px;
+      font-size: 1.13em;
+      box-shadow: 0 2px 8px #00deb370;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 560px) {
+      .quiz-container {
+        padding: 14px;
+      }
+      h2 { font-size: 1.35em; }
+      .btn { font-size: 1em; }
+      pre, #explanation { font-size: 1em; }
+      #question-number { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container" role="main" aria-label="Core Java Quiz">
+    <h2>🤣 Welcome to the <span style="color:#f7971e;font-size:1.2em;">Core Java Quiz Show!</span> 🤩</h2>
+    <div id="question-number" aria-live="polite"></div>
+    <p><strong id="question-text"></strong></p>
+    <pre id="code-block" style="display:none;" aria-label="Code snippet"></pre>
+    <form id="quiz-form" autocomplete="off" aria-describedby="result explanation" aria-live="polite">
+      <div class="options" id="options-container"></div>
+      <button type="button" class="btn" onclick="checkAnswer()" aria-controls="result">🔍 Submit Answer</button>
+      <button type="button" class="btn" onclick="showExplanation()" aria-controls="explanation">😲 Show Explanation</button>
+      <button type="button" class="btn" onclick="prevQuestion()" id="prev-btn">⬅️ Previous</button>
+      <button type="button" class="btn" onclick="nextQuestion()" id="next-btn">Next ➡️</button>
+    </form>
+    <div id="result" role="alert" aria-live="polite"></div>
+    <div id="explanation" tabindex="0"></div>
+  </div>
+  <script>
+    const quizData = [
+      {
+        question: "What will be the output of this code?",
+        code: `public class Test {
+    public static void main(String[] args) {
+        int x = 5;
+        System.out.println(x++ + ++x);
+    }
+}`,
+        options: {
+          a: "11",
+          b: "12",
+          c: "10",
+          d: "13"
+        },
+        answer: "b",
+        explanation: `Let’s break it down:
+x++ returns 5, then x becomes 6.
+++x increments x to 7 and returns 7.
+So expression: 5 + 7 = 12.
+Correct answer is 12.`
+      },
+      {
+        question: "What does the 'final' keyword mean in Java?",
+        code: "",
+        options: {
+          a: "Variable can be changed later",
+          b: "Method cannot be overridden",
+          c: "Class cannot be subclassed",
+          d: "All of the above"
+        },
+        answer: "d",
+        explanation: `'final' means:
+- For variables: value can't be changed after initialization.
+- For methods: cannot be overridden.
+- For classes: cannot be subclassed.`
+      },
+      {
+        question: "What happens when you try to access an array index out of bounds in Java?",
+        code: "",
+        options: {
+          a: "Returns null",
+          b: "Throws ArrayIndexOutOfBoundsException",
+          c: "Returns 0",
+          d: "Compiler error"
+        },
+        answer: "b",
+        explanation: `Accessing outside valid array indices results in runtime exception ArrayIndexOutOfBoundsException.`
+      },
+      {
+        question: "Which keyword is used to create a subclass in Java?",
+        code: "",
+        options: {
+          a: "implement",
+          b: "extends",
+          c: "inherits",
+          d: "super"
+        },
+        answer: "b",
+        explanation: `'extends' is used to inherit from a class (create subclass).`
+      },
+      {
+        question: "What is printed by this code snippet?",
+        code: `public class Main {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 20;
+        System.out.println(a > b ? a : b);
+    }
+}`,
+        options: {
+          a: "10",
+          b: "20",
+          c: "true",
+          d: "false"
+        },
+        answer: "b",
+        explanation: `Ternary operator returns 'a' if a>b else 'b'. Since 10>20 is false, it returns b = 20.`
+      },
+      {
+        question: "Which of these is NOT a primitive data type in Java?",
+        code: "",
+        options: {
+          a: "int",
+          b: "boolean",
+          c: "String",
+          d: "byte"
+        },
+        answer: "c",
+        explanation: `String is a class, NOT a primitive type in Java.`
+      },
+      {
+        question: "What is Output of this code?",
+        code: `public class Test {
+    public static void main(String[] args) {
+        String s1 = "Java";
+        String s2 = new String("Java");
+        System.out.println(s1 == s2);
+    }
+}`,
+        options: {
+          a: "true",
+          b: "false",
+          c: "Compilation error",
+          d: "Runtime error"
+        },
+        answer: "b",
+        explanation: `"==" compares references, not content. s1 and s2 reference different objects, so false.`
+      },
+      {
+        question: "What feature does Java support to achieve platform independence?",
+        code: "",
+        options: {
+          a: "Compiler",
+          b: "JVM (Java Virtual Machine)",
+          c: "JRE",
+          d: "JDK"
+        },
+        answer: "b",
+        explanation: `JVM interprets bytecode on any platform, enabling platform independence.`
+      },
+      {
+        question: "What is the output of this Java snippet?",
+        code: `public class Test {
+    public static void main(String[] args) {
+        System.out.println(3 + 4 + "Java");
+    }
+}`,
+        options: {
+          a: "7Java",
+          b: "34Java",
+          c: "Java7",
+          d: "Compile error"
+        },
+        answer: "a",
+        explanation: `3+4 = 7 (integer addition) and then "Java" concatenated as string => "7Java".`
+      },
+      {
+        question: "Which keyword is used to handle exceptions in Java?",
+        code: "",
+        options: {
+          a: "try",
+          b: "catch",
+          c: "finally",
+          d: "All of the above"
+        },
+        answer: "d",
+        explanation: `try is to enclose code, catch is to capture exception, finally always executes.`
+      },
+      {
+        question: "What will be the output?",
+        code: `class Test {
+    public static void main(String[] args) {
+        int i = 0;
+        System.out.println(i++);
+        System.out.println(++i);
+    }
+}`,
+        options: {
+          a: "0 and 2",
+          b: "1 and 1",
+          c: "1 and 2",
+          d: "0 and 1"
+        },
+        answer: "a",
+        explanation: `i++ returns 0 then i=1,
+++i increments to 2 and returns 2.`
+      },
+      {
+        question: "Which is the correct syntax to create an array in Java?",
+        code: "",
+        options: {
+          a: "int[] arr = new int;",
+          b: "int arr[] = new int;",
+          c: "Both a and b",
+          d: "int arr = new int;"
+        },
+        answer: "c",
+        explanation: `Both 'int[] arr...' and 'int arr[]...' are valid Java array declarations.`
+      },
+      {
+        question: "What does this code print?",
+        code: `public class Test {
+    public static void main(String args[]) {
+        System.out.println("Hello" + 1 + 2);
+    }
+}`,
+        options: {
+          a: "Hello3",
+          b: "Hello12",
+          c: "3Hello",
+          d: "Compilation error"
+        },
+        answer: "b",
+        explanation: `"Hello" + 1 = "Hello1", then + 2 = "Hello12" because concatenation is left to right.`
+      },
+      {
+        question: "Which of the following is a checked exception?",
+        code: "",
+        options: {
+          a: "NullPointerException",
+          b: "IOException",
+          c: "ArrayIndexOutOfBoundsException",
+          d: "ArithmeticException"
+        },
+        answer: "b",
+        explanation: `IOException is a checked exception, must be handled or declared.`
+      },
+      {
+        question: "What is the default value of a boolean variable in Java?",
+        code: "",
+        options: {
+          a: "true",
+          b: "false",
+          c: "null",
+          d: "0"
+        },
+        answer: "b",
+        explanation: `Default value of boolean in Java is false.`
+      },
+      {
+        question: "Which method is the entry point of a Java application?",
+        code: "",
+        options: {
+          a: "main()",
+          b: "start()",
+          c: "init()",
+          d: "run()"
+        },
+        answer: "a",
+        explanation: `"main()" method is the entry point.`
+      },
+      {
+        question: "What is the output of this?",
+        code: `public class Test {
+    public static void main(String[] args) {
+        int x = 3;
+        System.out.println(x *= 2);
+    }
+}`,
+        options: {
+          a: "3",
+          b: "6",
+          c: "9",
+          d: "Error"
+        },
+        answer: "b",
+        explanation: `x *= 2 is shorthand for x = x * 2; output 6.`
+      },
+      {
+        question: "Which of these is used for comments in Java?",
+        code: "",
+        options: {
+          a: "// single line",
+          b: "/* multi line */",
+          c: "/** documentation */",
+          d: "All of the above"
+        },
+        answer: "d",
+        explanation: `All are valid comment types in Java.`
+      },
+      {
+        question: "Which class is the parent class of all classes in Java?",
+        code: "",
+        options: {
+          a: "Object",
+          b: "Class",
+          c: "Thread",
+          d: "Main"
+        },
+        answer: "a",
+        explanation: `java.lang.Object is the root superclass of all Java classes.`
+      },
+      {
+        question: "What will this print?",
+        code: `public class Test {
+    public static void main(String[] args) {
+        System.out.println("" + 1 + 2 + 3);
+    }
+}`,
+        options: {
+          a: "123",
+          b: "6",
+          c: "1236",
+          d: "Compile Error"
+        },
+        answer: "a",
+        explanation: `"" + 1 = "1", then + 2 = "12", then + 3 = "123" (string concatenation).`
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    const questionNumberElem = document.getElementById('question-number');
+    const questionTextElem = document.getElementById('question-text');
+    const codeBlockElem = document.getElementById('code-block');
+    const optionsContainer = document.getElementById('options-container');
+    const resultElem = document.getElementById('result');
+    const explanationElem = document.getElementById('explanation');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    function loadQuestion(index) {
+      const q = quizData[index];
+      questionNumberElem.textContent = `Question ${index + 1} of ${quizData.length}`;
+      questionTextElem.textContent = q.question;
+      if (q.code && q.code.trim() !== "") {
+        codeBlockElem.style.display = 'block';
+        codeBlockElem.textContent = q.code;
+      } else {
+        codeBlockElem.style.display = 'none';
+        codeBlockElem.textContent = '';
+      }
+      optionsContainer.innerHTML = '';
+      for (const [key, value] of Object.entries(q.options)) {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="radio" name="answer" value="${key}"> ${key}) ${value}`;
+        optionsContainer.appendChild(label);
+      }
+      resultElem.innerHTML = '';
+      explanationElem.style.display = 'none';
+      explanationElem.textContent = '';
+      prevBtn.disabled = (index === 0);
+      nextBtn.disabled = (index === quizData.length - 1);
+    }
+
+    function checkAnswer() {
+      const radios = document.getElementsByName('answer');
+      let selected = null;
+      for (const radio of radios) {
+        if (radio.checked) {
+          selected = radio.value;
+          break;
+        }
+      }
+      if (!selected) {
+        resultElem.style.color = "#fc4141";
+        resultElem.innerHTML = '🤪 <span>Pick an answer first!</span>';
+        return;
+      }
+      const correct = quizData[currentQuestionIndex].answer;
+      if (selected === correct) {
+        resultElem.style.color = "#12bb44";
+        resultElem.innerHTML = '<span>🎉 Correct! Java would be proud. 🌟</span>';
+        const span = resultElem.querySelector('span');
+        span.animate([{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:210});
+      } else {
+        const funny = ['😜 Oops, wrong answer!','🐍 That one slithered away.','🐒 Not quite, monkeying around?','🙀 Java says: Try again!'];
+        resultElem.style.color = "#fc4141";
+        resultElem.innerHTML = `<span>${funny[Math.floor(Math.random()*funny.length)]}</span>`;
+        const span = resultElem.querySelector('span');
+        span.animate([{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:220});
+      }
+    }
+
+    function showExplanation() {
+      const explanation = quizData[currentQuestionIndex].explanation;
+      explanationElem.style.display = 'block';
+      explanationElem.textContent = explanation + " 🤓";
+      explanationElem.focus();
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < quizData.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion(currentQuestionIndex);
+      }
+    }
+
+    // Initialize with first question
+    loadQuestion(currentQuestionIndex);
+  </script>
+</body>
+</html>

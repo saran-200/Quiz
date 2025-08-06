@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🟠 Medium Level Core Java Quiz!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+    body {
+      margin: 0; padding: 0;
+      background: linear-gradient(135deg, #fdebd0 0%, #ffe6a7 80%, #ffc685 100%);
+      font-family: 'Quicksand', Arial, sans-serif;
+      min-height: 100vh;
+      transition: background 0.3s;
+    }
+    .container {
+      max-width: 650px;
+      margin: 56px auto 30px auto;
+      background: #fff9f0;
+      border-radius: 22px;
+      box-shadow: 0 6px 36px #c65e1280, 0 2px 2px #fae3b3;
+      padding: 42px 42px 28px 42px;
+      position: relative;
+    }
+    h2 {
+      text-align: center;
+      font-weight: 700;
+      font-size: 2.15em;
+      margin-top: 0;
+      color: #c15e00;
+      margin-bottom: 17px;
+    }
+    .progress-bar-bg {
+      background: #f9e5c1;
+      border-radius: 20px;
+      height: 15px;
+      width: 100%;
+      margin-bottom: 33px;
+      box-shadow: 0 1px 7px #f0ca6cbf;
+    }
+    .progress-bar-fg {
+      background: linear-gradient(90deg, #ffb347 40%, #ffcc33 100%);
+      height: 100%;
+      border-radius: 20px;
+      width: 0;
+      transition: width 0.4s cubic-bezier(.62,1.6,.57,1);
+      box-shadow: 0 2px 10px #d8a02899;
+    }
+    .question-card {
+      margin-top: 13px;
+      background: #fff4e5;
+      border-radius: 14px;
+      padding: 26px 20px 13px 20px;
+      box-shadow: 0 2px 12px #deb36c57;
+      font-size: 1.13em;
+      user-select: none;
+    }
+    .ques-number {
+      color: #b45b00;
+      font-size: 1.16em;
+      margin-bottom: 13px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .ques-number::before { content: "🔥"; }
+    .question-text { font-weight: 600; }
+    pre {
+      background: #fff0cc;
+      color: #a75d00;
+      padding: 14px 11px 13px 14px;
+      border-radius: 7px;
+      font-family: 'Fira Mono', monospace;
+      margin: 13px 0 19px 0;
+      font-size: 1.03em;
+      white-space: pre-wrap;
+      box-shadow: 0 1px 6px #deb360a1;
+    }
+    .options {
+      margin: 0 0 5px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: stretch;
+      user-select: none;
+    }
+    .option-btn {
+      padding: 17px 18px;
+      border: none;
+      border-radius: 11px;
+      font-size: 1.18em;
+      font-weight: bold;
+      background: linear-gradient(115deg, #fde0b9 80%, #eac17f 100%);
+      color: #774e00;
+      margin: 0;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #d2982090;
+      transition: background 0.15s, box-shadow 0.13s, transform 0.12s;
+      outline: none;
+      text-align: left;
+      white-space: pre-wrap;
+      border: 2px solid #e9c192;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .option-btn:hover:not(:disabled), .option-btn:focus:not(:disabled) {
+      background: linear-gradient(115deg, #fff0a9 80%, #fffbb3 100%);
+      box-shadow: 0 6px 23px #ffe8925c;
+    }
+    .option-btn.disabled {
+      pointer-events: none;
+      filter: grayscale(0.5);
+      cursor: not-allowed;
+    }
+    .option-btn.correct {
+      background: linear-gradient(90deg, #d5ffb5 80%, #b0e86e 100%);
+      color: #476800;
+      border-color: #8ad740;
+      animation: correct-bounce 0.25s;
+    }
+    .option-btn.wrong {
+      background: linear-gradient(90deg, #ffb7ab 80%, #ff9282 100%);
+      color: #8b2500;
+      border-color: #ff4a36;
+      animation: wrong-shake 0.24s;
+    }
+    @keyframes correct-bounce {
+      40% { transform: scale(1.07); }
+      100% { transform: scale(1); }
+    }
+    @keyframes wrong-shake {
+      18% { transform: translateX(-7px); }
+      38% { transform: translateX(6px); }
+      61% { transform: translateX(-3px); }
+      100% { transform: translateX(0); }
+    }
+    .controls {
+      margin: 19px 0 0 0;
+      display: flex;
+      gap: 8px 13px;
+    }
+    .btn {
+      padding: 10px 23px;
+      font-size: 1.10em;
+      color: #fff;
+      background: linear-gradient(95deg, #cd7e00 40%, #f5a623 100%);
+      border: none;
+      border-radius: 7px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 3px 22px #f5a6237f;
+      transition: background 0.17s, transform 0.12s;
+      user-select: none;
+      margin: 0;
+    }
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+    .explain-btn {
+      background: linear-gradient(94deg, #f7d64a, #f5a623 99%);
+      color: #5d3c00;
+    }
+    .nav-btn {
+      background: linear-gradient(70deg, #cf9e32, #ffaa00 90%);
+    }
+    .result {
+      min-height: 31px;
+      margin: 15px 0 9px 0;
+      font-size: 1.22em;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #6f3d00;
+      transition: color 0.18s;
+      user-select: none;
+    }
+    .emoji {
+      font-size: 2em;
+    }
+    .explanation {
+      margin-top: 14px;
+      background: #fef5d4;
+      border: 2px dashed #f5a6238a;
+      color: #795548;
+      padding: 13px 14px 11px 14px;
+      border-radius: 7px;
+      font-size: 1.085em;
+      display: none;
+      transition: 0.25s;
+      box-shadow: 0 0.5px 7px #f5a62353;
+      white-space: pre-wrap;
+      user-select: text;
+    }
+    @media (max-width: 650px) {
+      .container {
+        padding: 13px 3vw;
+      }
+      h2 {
+        font-size: 1.45em;
+      }
+      .question-card {
+        padding: 10px 4vw 10px 4vw;
+      }
+      .option-btn {
+        font-size: 1em;
+        padding: 13px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Medium Level Core Java Quiz">
+    <h2>🟠 Medium Level Core Java Quiz!</h2>
+    <div class="progress-bar-bg" aria-hidden="true">
+      <div class="progress-bar-fg" id="progress"></div>
+    </div>
+    <div class="question-card">
+      <div class="ques-number" id="question-number"></div>
+      <div class="question-text" id="question-text"></div>
+      <pre id="code-block" style="display:none" aria-label="Java code snippet"></pre>
+      <div class="options" id="options-container" role="list"></div>
+      <div class="controls">
+        <button class="btn explain-btn" type="button" onclick="showExplanation()" id="explain-btn" disabled>🤓 Show Explanation</button>
+        <button class="btn nav-btn" type="button" onclick="prevQuestion()" id="prev-btn">⬅️ Prev</button>
+        <button class="btn nav-btn" type="button" onclick="nextQuestion()" id="next-btn" disabled>Next ➡️</button>
+      </div>
+      <div class="result" id="result" role="alert" aria-live="polite"></div>
+      <div class="explanation" id="explanation" tabindex="0"></div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "What will be the output here?",
+        code: `public class Test {
+  public static void main(String[] args) {
+      int a = 5;
+      int b = a++ + ++a;
+      System.out.println(b);
+  }
+}`,
+        options: {
+          a: "11",
+          b: "12",
+          c: "10",
+          d: "13"
+        },
+        answer: "b",
+        explanation: "a++ returns 5 (then a=6), ++a increments a to 7, sum is 5 + 7 = 12."
+      },
+      {
+        question: "Which keyword is used to define a constant variable?",
+        code: "",
+        options: {
+          a: "constant",
+          b: "final",
+          c: "static",
+          d: "immutable"
+        },
+        answer: "b",
+        explanation: "'final' declares a variable whose value cannot be changed."
+      },
+      {
+        question: "What is the default value of a local object reference in Java?",
+        code: "",
+        options: {
+          a: "null",
+          b: "0",
+          c: "undefined",
+          d: "depends on JVM"
+        },
+        answer: "a",
+        explanation: "Local object references default to null if not initialized."
+      },
+      {
+        question: "Which of these is NOT a primitive data type?",
+        code: "",
+        options: {
+          a: "int",
+          b: "char",
+          c: "String",
+          d: "double"
+        },
+        answer: "c",
+        explanation: "String is a class, not a primitive data type."
+      },
+      {
+        question: "Which data type is best for storing characters?",
+        code: "",
+        options: {
+          a: "char",
+          b: "int",
+          c: "String",
+          d: "boolean"
+        },
+        answer: "a",
+        explanation: "'char' stores a single Unicode character."
+      },
+      {
+        question: "What does this code print?",
+        code: `public class Test {
+  public static void main(String[] args) {
+      System.out.println(3 + 4 + "Java");
+  }
+}`,
+        options: {
+          a: "7Java",
+          b: "34Java",
+          c: "Java7",
+          d: "Compile error"
+        },
+        answer: "a",
+        explanation: "3+4=7 then concatenated to 'Java'; prints '7Java'."
+      },
+      {
+        question: "Which loop is guaranteed to execute the body at least once?",
+        code: "",
+        options: {
+          a: "for",
+          b: "while",
+          c: "do-while",
+          d: "if"
+        },
+        answer: "c",
+        explanation: "'do-while' loop executes body first before checking condition."
+      },
+      {
+        question: "Which method is the entry point of a Java application?",
+        code: "",
+        options: {
+          a: "start()",
+          b: "main()",
+          c: "run()",
+          d: "init()"
+        },
+        answer: "b",
+        explanation: "main(String[] args) is the entry point method."
+      },
+      {
+        question: "What does this print?",
+        code: `public class Test {
+  public static void main(String[] args) {
+      String s1 = "Java";
+      String s2 = "Java";
+      System.out.println(s1 == s2);
+  }
+}`,
+        options: {
+          a: "true",
+          b: "false",
+          c: "Compile error",
+          d: "Runtime error"
+        },
+        answer: "a",
+        explanation: "String literals with same content refer to same String object."
+      },
+      {
+        question: "What is the size of an int in Java?",
+        code: "",
+        options: {
+          a: "8 bits",
+          b: "16 bits",
+          c: "32 bits",
+          d: "64 bits"
+        },
+        answer: "c",
+        explanation: "int is 32-bit signed integer."
+      },
+      {
+        question: "Which keyword is used to create a subclass?",
+        code: "",
+        options: {
+          a: "extends",
+          b: "implements",
+          c: "inherits",
+          d: "super"
+        },
+        answer: "a",
+        explanation: "'extends' is the keyword used for inheritance."
+      },
+      {
+        question: "Which keyword is used to handle exceptions?",
+        code: "",
+        options: {
+          a: "try",
+          b: "catch",
+          c: "finally",
+          d: "All of the above"
+        },
+        answer: "d",
+        explanation: "try, catch and finally are used in exception handling."
+      },
+      {
+        question: "What will be printed by this code?",
+        code: `public class Test {
+  public static void main(String[] args) {
+      System.out.println('A' + 1);
+  }
+}`,
+        options: {
+          a: "A1",
+          b: "66",
+          c: "Compile error",
+          d: "Runtime error"
+        },
+        answer: "b",
+        explanation: "'A' is converted to int (65), plus 1 equals 66."
+      },
+      {
+        question: "Which statement declares a double variable named price?",
+        code: "",
+        options: {
+          a: "double price;",
+          b: "price double;",
+          c: "double-price;",
+          d: "price = double;"
+        },
+        answer: "a",
+        explanation: "Correct syntax is 'double price;'."
+      },
+      {
+        question: "What will this print?",
+        code: `public class Test {
+  public static void main(String[] args) {
+      int x = 7;
+      x += 3;
+      System.out.println(x);
+  }
+}`,
+        options: {
+          a: "7",
+          b: "3",
+          c: "10",
+          d: "Compile error"
+        },
+        answer: "c",
+        explanation: "x += 3 means x = x + 3; so x becomes 10."
+      },
+      {
+        question: "What is the output of this code?",
+        code: `public class Test {
+  public static void main(String[] args) {
+      System.out.println(1 + 2 + 3 + \"Hello\" + 4 + 5);
+  }
+}`,
+        options: {
+          a: "6Hello45",
+          b: "123Hello45",
+          c: "Hello15",
+          d: "Compile error"
+        },
+        answer: "a",
+        explanation: "Integer addition is done first (1+2+3=6), then concatenated with 'Hello' and 4,5."
+      },
+      {
+        question: "Which of the following is not a Java keyword?",
+        code: "",
+        options: {
+          a: "static",
+          b: "Boolean",
+          c: "try",
+          d: "this"
+        },
+        answer: "b",
+        explanation: "'Boolean' is a wrapper class, not a keyword."
+      },
+      {
+        question: "Which of these is a valid identifier in Java?",
+        code: "",
+        options: {
+          a: "1var",
+          b: "_var",
+          c: "var-1",
+          d: "var 1"
+        },
+        answer: "b",
+        explanation: "Identifiers cannot start with digits or contain spaces or hyphens, but underscore is valid."
+      },
+      {
+        question: "Which of the following loops will always execute at least once?",
+        code: "",
+        options: {
+          a: "for",
+          b: "while",
+          c: "do-while",
+          d: "if"
+        },
+        answer: "c",
+        explanation: "'do-while' executes the loop body before condition checking."
+      },
+      {
+        question: "What is the range of a byte in Java?",
+        code: "",
+        options: {
+          a: "-128 to 127",
+          b: "-32,768 to 32,767",
+          c: "-2,147,483,648 to 2,147,483,647",
+          d: "0 to 255"
+        },
+        answer: "a",
+        explanation: "byte is 8 bits signed, range -128 to 127."
+      },
+      {
+        question: "What does the 'static' keyword signify?",
+        code: "",
+        options: {
+          a: "Variable belongs to instance",
+          b: "Variable belongs to class",
+          c: "Variable cannot be changed",
+          d: "Method cannot be overridden"
+        },
+        answer: "b",
+        explanation: "static members belong to the class, shared by all instances."
+      },
+      {
+        question: "Which operator is used for logical AND in Java?",
+        code: "",
+        options: {
+          a: "&",
+          b: "&&",
+          c: "|",
+          d: "||"
+        },
+        answer: "b",
+        explanation: "&& is the logical AND operator; & is bitwise AND."
+      },
+      {
+        question: "What keyword is used to inherit from an interface?",
+        code: "",
+        options: {
+          a: "extends",
+          b: "implements",
+          c: "inherits",
+          d: "super"
+        },
+        answer: "b",
+        explanation: "Classes implement interfaces using 'implements' keyword."
+      },
+      {
+        question: "What happens if a method throws a checked exception but it is not caught or declared?",
+        code: "",
+        options: {
+          a: "Compilation error",
+          b: "Runtime error",
+          c: "Silent ignore",
+          d: "Program runs normally"
+        },
+        answer: "a",
+        explanation: "Java requires checked exceptions to be handled or declared."
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let answeredCorrectly = false;
+
+    const questionNumberElem = document.getElementById('question-number');
+    const questionTextElem = document.getElementById('question-text');
+    const codeBlockElem = document.getElementById('code-block');
+    const optionsContainer = document.getElementById('options-container');
+    const resultElem = document.getElementById('result');
+    const explanationElem = document.getElementById('explanation');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const explainBtn = document.getElementById('explain-btn');
+    const progressElem = document.getElementById('progress');
+
+    function updateProgress(index) {
+      progressElem.style.width = `${((index + 1) / quizData.length) * 100}%`;
+    }
+
+    function loadQuestion(index) {
+      answeredCorrectly = false;
+      const q = quizData[index];
+      questionNumberElem.textContent = `Question ${index + 1} of ${quizData.length}`;
+      questionTextElem.textContent = q.question;
+      if (q.code && q.code.trim()) {
+        codeBlockElem.style.display = "block";
+        codeBlockElem.textContent = q.code;
+      } else {
+        codeBlockElem.style.display = "none";
+        codeBlockElem.textContent = "";
+      }
+      optionsContainer.innerHTML = "";
+      for (const [key, value] of Object.entries(q.options)) {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = `${key}) ${value}`;
+        btn.type = "button";
+        btn.tabIndex = 0;
+        btn.onclick = () => handleOptionClick(btn, key);
+        optionsContainer.appendChild(btn);
+      }
+      resultElem.textContent = "";
+      explanationElem.style.display = "none";
+      explanationElem.textContent = "";
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = true; // Disable next until correct answer selected
+      explainBtn.disabled = true;
+      updateProgress(index);
+    }
+
+    function handleOptionClick(btn, selected) {
+      if (answeredCorrectly) return;
+      const correct = quizData[currentQuestionIndex].answer;
+      const buttons = Array.from(optionsContainer.children);
+
+      if (selected === correct) {
+        btn.classList.add("correct");
+        resultElem.style.color = "#2e7d32";
+        resultElem.innerHTML = '<span class="emoji">🎉</span> Correct!';
+        answeredCorrectly = true;
+        nextBtn.disabled = false;
+        explainBtn.disabled = false;
+        buttons.forEach(b => b.disabled = true);
+      } else {
+        btn.classList.add("wrong");
+        btn.disabled = true;
+        resultElem.style.color = "#c62828";
+        const fun = [
+          "Nope, that’s tricky! 😲",
+          "Try again! 🙃",
+          "Not quite, give it another shot! 🦾",
+          "Oops, not this one! 😎"
+        ];
+        resultElem.innerHTML = `<span class="emoji">🤔</span> ${fun[Math.floor(Math.random()*fun.length)]}`;
+      }
+    }
+
+    function showExplanation() {
+      const explanation = quizData[currentQuestionIndex].explanation || "No explanation available.";
+      explanationElem.style.display = "block";
+      explanationElem.textContent = explanation + " 🤓";
+      explanationElem.focus();
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < quizData.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion(currentQuestionIndex);
+      }
+    }
+
+    loadQuestion(currentQuestionIndex);
+  </script>
+</body>
+</html>

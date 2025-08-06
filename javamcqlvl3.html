@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Java Mid-Level Quiz - Core & Data Structures</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(120deg, #289672 0%, #6a82fb 100%);
+      color: #222d3b;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .quiz-container {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(45, 58, 83, 0.18);
+      max-width: 600px;
+      width: 95%;
+      padding: 32px 24px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .timer {
+      font-size: 1.1em;
+      color: #a259d9;
+      margin-bottom: 18px;
+    }
+    .timer-slots {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+    .slot {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background-color: #b8b8b8;
+      transition: background-color 0.3s;
+    }
+    .slot.active {
+      background-color: #a259d9;
+    }
+    .question {
+      font-weight: 500;
+      font-size: 1.25em;
+      margin-bottom: 18px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .option {
+      padding: 13px 18px;
+      border: 2px solid #b8e994;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #d3ffe8;
+      color: #2d3a4a;
+      font-size: 1em;
+      transition: background 0.2s, border 0.2s, color 0.2s;
+      user-select: none;
+    }
+    .option:hover:not(:disabled) {
+      background: #a259d9;
+      color: #fff;
+      border-color: #a259d9;
+    }
+    .option.correct {
+      background-color: #4caf50 !important;
+      color: white;
+      border-color: #4caf50 !important;
+      cursor: default;
+    }
+    .option.wrong {
+      background-color: #f44336 !important;
+      color: white;
+      border-color: #f44336 !important;
+      cursor: default;
+    }
+    .result {
+      font-size: 1.35em;
+      color: #47a386;
+      margin: 16px 0;
+      display: none;
+    }
+    .restart-btn, .next-btn {
+      background: #47a386;
+      color: #fff;
+      border: none;
+      padding: 11px 22px;
+      font-size: 1.05em;
+      border-radius: 9px;
+      cursor: pointer;
+      margin-top: 16px;
+      display: none;
+      transition: background 0.2s;
+    }
+    .restart-btn:hover, .next-btn:hover {
+      background-color: #a259d9;
+    }
+    .next-btn.active {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="timer">Slot Time Left: <span id="time">0</span>s</div>
+    <div class="timer-slots">
+      <div class="slot" id="slot1"></div>
+      <div class="slot" id="slot2"></div>
+      <div class="slot" id="slot3"></div>
+    </div>
+    <div class="question"></div>
+    <div class="options"></div>
+    <div class="result">Your score: <span id="score">0</span></div>
+    <button class="next-btn">Next</button>
+    <button class="restart-btn">Restart Quiz</button>
+  </div>
+<script>
+const quizData = [
+  // Core Java
+  {
+    question: "Which method is used to compare two strings in Java for equality?",
+    options: [
+      "==",
+      "equals()",
+      "compareTo()",
+      "equalsIgnoreCase()"
+    ],
+    answer: "equals()"
+  },
+  {
+    question: "Which interface does ArrayList implement?",
+    options: [
+      "Set",
+      "Map",
+      "List",
+      "Queue"
+    ],
+    answer: "List"
+  },
+  {
+    question: "Which access modifier makes a member visible everywhere?",
+    options: [
+      "protected",
+      "default",
+      "private",
+      "public"
+    ],
+    answer: "public"
+  },
+  {
+    question: "Which keyword is used for exception handling in Java?",
+    options: [
+      "throw",
+      "finalize",
+      "catch",
+      "try"
+    ],
+    answer: "try"
+  },
+  {
+    question: "Which of these is not a primitive type in Java?",
+    options: [
+      "int",
+      "float",
+      "char",
+      "String"
+    ],
+    answer: "String"
+  },
+  {
+    question: "Which of the following gives the length of an array arr?",
+    options: [
+      "arr.length",
+      "arr.length()",
+      "length(arr)",
+      "arr.size()"
+    ],
+    answer: "arr.length"
+  },
+  {
+    question: "Which collection allows duplicate elements?",
+    options: [
+      "HashSet",
+      "ArrayList",
+      "TreeSet",
+      "LinkedHashSet"
+    ],
+    answer: "ArrayList"
+  },
+  {
+    question: "Which keyword is used to create an object?",
+    options: [
+      "class",
+      "this",
+      "Object",
+      "new"
+    ],
+    answer: "new"
+  },
+  {
+    question: "Which class is at the top of the exception class hierarchy?",
+    options: [
+      "Object",
+      "Throwable",
+      "Exception",
+      "RuntimeException"
+    ],
+    answer: "Throwable"
+  },
+  {
+    question: "What is the output? int x = 5; System.out.println(x++);",
+    options: [
+      "6",
+      "5",
+      "Error",
+      "0"
+    ],
+    answer: "5"
+  },
+  {
+    question: "Which keyword prevents method overriding?",
+    options: [
+      "private",
+      "final",
+      "static",
+      "protected"
+    ],
+    answer: "final"
+  },
+  {
+    question: "Which is not a type of constructor?",
+    options: [
+      "Default",
+      "Parameterized",
+      "Void",
+      "Copy"
+    ],
+    answer: "Void"
+  },
+  {
+    question: "What is the parent interface of all collection interfaces?",
+    options: [
+      "List",
+      "Iterable",
+      "Collection",
+      "Set"
+    ],
+    answer: "Collection"
+  },
+  {
+    question: "Which exception is thrown for illegal array indexes?",
+    options: [
+      "ArrayIndexOutOfBoundsException",
+      "NullPointerException",
+      "IllegalArgumentException",
+      "ArithmeticException"
+    ],
+    answer: "ArrayIndexOutOfBoundsException"
+  },
+  {
+    question: "Which data structure is used for method call management?",
+    options: [
+      "Array",
+      "Queue",
+      "Stack",
+      "Tree"
+    ],
+    answer: "Stack"
+  },
+  // Linked List, Stack, Queue, Collections
+  {
+    question: "Which of the following allows constant-time insertion and removal from both ends?",
+    options: [
+      "ArrayList",
+      "LinkedList",
+      "Stack",
+      "HashSet"
+    ],
+    answer: "LinkedList"
+  },
+  {
+    question: "How do you check if a stack is empty in Java?",
+    options: [
+      "size() == 0",
+      "isEmpty()",
+      "peek() == null",
+      "top() == null"
+    ],
+    answer: "isEmpty()"
+  },
+  {
+    question: "Which method removes the first element from a LinkedList?",
+    options: [
+      "pop()",
+      "removeFirst()",
+      "delete()",
+      "poll()"
+    ],
+    answer: "removeFirst()"
+  },
+  {
+    question: "Which interface does Queue extend?",
+    options: [
+      "Collection",
+      "List",
+      "Set",
+      "Array"
+    ],
+    answer: "Collection"
+  },
+  {
+    question: "What is the output? Stack<Integer> stack = new Stack<>(); stack.push(10); stack.pop(); System.out.println(stack.isEmpty());",
+    options: [
+      "true",
+      "false",
+      "10",
+      "Error"
+    ],
+    answer: "true"
+  },
+  {
+    question: "Which statement about Java's PriorityQueue is correct?",
+    options: [
+      "It maintains FIFO order",
+      "It allows null elements",
+      "It is not thread-safe",
+      "It sorts elements naturally"
+    ],
+    answer: "It sorts elements naturally"
+  },
+  {
+    question: "What does LinkedList.removeLast() do?",
+    options: [
+      "Removes and returns the last element",
+      "Removes the first element",
+      "Removes all elements",
+      "Removes the last index only if duplicate"
+    ],
+    answer: "Removes and returns the last element"
+  },
+  {
+    question: "Which method would you use to peek at the head of a queue?",
+    options: [
+      "element()",
+      "peek()",
+      "top()",
+      "head()"
+    ],
+    answer: "peek()"
+  },
+  {
+    question: "Which property is TRUE for singly linked lists?",
+    options: [
+      "Can traverse in both directions",
+      "Each node has a next pointer",
+      "Each node has previous and next pointers",
+      "Single node contains only data, no links"
+    ],
+    answer: "Each node has a next pointer"
+  },
+  {
+    question: "Which data structure is best for implementing Undo in editors?",
+    options: [
+      "Queue",
+      "ArrayList",
+      "Stack",
+      "PriorityQueue"
+    ],
+    answer: "Stack"
+  },
+  {
+    question: "Which collection does not maintain insertion order?",
+    options: [
+      "HashSet",
+      "ArrayList",
+      "LinkedList",
+      "LinkedHashSet"
+    ],
+    answer: "HashSet"
+  }
+];
+let currentQuestion = 0;
+let score = 0;
+const slotDurations = [5, 10, 10]; // slot durations in seconds
+const totalSlots = slotDurations.length;
+let currentSlot = 0;
+let timeLeft = slotDurations[0];
+let timerInterval;
+const timerEl = document.getElementById('time');
+const questionEl = document.querySelector('.question');
+const optionsEl = document.querySelector('.options');
+const resultEl = document.querySelector('.result');
+const scoreEl = document.getElementById('score');
+const restartBtn = document.querySelector('.restart-btn');
+const nextBtn = document.querySelector('.next-btn');
+const slots = [
+  document.getElementById('slot1'),
+  document.getElementById('slot2'),
+  document.getElementById('slot3'),
+];
+let answeredCorrectly = false;
+function loadQuestion() {
+  if (currentQuestion >= quizData.length) {
+    endQuiz();
+    return;
+  }
+  answeredCorrectly = false;
+  currentSlot = 0;
+  timeLeft = slotDurations[0];
+  updateSlots();
+  updateTimerDisplay(timeLeft);
+  nextBtn.style.display = 'none';
+  const currentQuiz = quizData[currentQuestion];
+  questionEl.textContent = `Q${currentQuestion + 1}. ${currentQuiz.question}`;
+  optionsEl.innerHTML = '';
+  currentQuiz.options.forEach(option => {
+    const button = document.createElement('button');
+    button.classList.add('option');
+    button.textContent = option;
+    button.disabled = false;
+    button.classList.remove('correct', 'wrong');
+    button.onclick = () => handleAnswer(button, option);
+    optionsEl.appendChild(button);
+  });
+  startTimer();
+}
+function handleAnswer(button, selectedOption) {
+  if (answeredCorrectly) return;
+  const correct = quizData[currentQuestion].answer;
+  if (selectedOption === correct) {
+    answeredCorrectly = true;
+    clearInterval(timerInterval);
+    button.classList.add('correct');
+    score++;
+    disableOptions();
+    nextBtn.style.display = 'inline-block';
+  } else {
+    button.classList.add('wrong');
+    button.disabled = true;
+    advanceSlotOnWrong();
+  }
+}
+function startTimer() {
+  updateTimerDisplay(timeLeft);
+  updateSlots();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay(timeLeft);
+    if (timeLeft <= 0) {
+      if (!answeredCorrectly) {
+        if (currentSlot < totalSlots - 1) {
+          currentSlot++;
+          timeLeft = slotDurations[currentSlot];
+          updateSlots();
+        } else {
+          clearInterval(timerInterval);
+          disableOptions();
+          nextBtn.style.display = 'inline-block';
+        }
+      } else {
+        clearInterval(timerInterval);
+      }
+    }
+  }, 1000);
+}
+function advanceSlotOnWrong() {
+  clearInterval(timerInterval);
+  if (currentSlot < totalSlots - 1) {
+    currentSlot++;
+    timeLeft = slotDurations[currentSlot];
+    updateSlots();
+    startTimer();
+  }
+}
+function updateSlots() {
+  slots.forEach((slot, index) => {
+    slot.classList.toggle('active', index === currentSlot);
+  });
+}
+function updateTimerDisplay(time) {
+  timerEl.textContent = time;
+}
+function disableOptions() {
+  const optionButtons = document.querySelectorAll('.option');
+  optionButtons.forEach(button => button.disabled = true);
+}
+function endQuiz() {
+  clearInterval(timerInterval);
+  questionEl.style.display = 'none';
+  optionsEl.style.display = 'none';
+  nextBtn.style.display = 'none';
+  resultEl.style.display = 'block';
+  scoreEl.textContent = score;
+  restartBtn.style.display = 'inline-block';
+}
+nextBtn.addEventListener('click', () => {
+  currentQuestion++;
+  loadQuestion();
+});
+restartBtn.addEventListener('click', () => {
+  currentQuestion = 0;
+  score = 0;
+  questionEl.style.display = 'block';
+  optionsEl.style.display = 'flex';
+  resultEl.style.display = 'none';
+  nextBtn.style.display = 'none';
+  restartBtn.style.display = 'none';
+  loadQuestion();
+});
+loadQuestion();
+</script>
+</body>
+</html>
