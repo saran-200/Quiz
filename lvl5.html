@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Java OOP & DSA — Fun Quiz 🎉</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --card:#ffffff;
+      --bg1:#ffecd2;
+      --bg2:#fcb69f;
+      --accent:#ff8a65;
+      --good:#2e8b57;
+      --bad:#d9534f;
+      --muted:#9e9e9e;
+    }
+    html,body{height:100%;margin:0;font-family: "Trebuchet MS", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    body{
+      display:flex;align-items:center;justify-content:center;
+      background: radial-gradient(circle at 10% 20%, #fff7f0, transparent 20%),
+                  linear-gradient(120deg, #ffe29f 0%, #ffa07a 50%, #ff9a9e 100%);
+      min-height:100vh;
+      padding:30px;
+    }
+
+    .wrap{
+      width:100%;max-width:780px;
+      position:relative;
+    }
+
+    .topbar{
+      display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;
+    }
+    .title{
+      font-size:20px;font-weight:800;color:#4a2b0f;
+      display:flex;gap:10px;align-items:center;
+    }
+    .subtitle{font-size:12px;color:#6b4a3a;opacity:0.9}
+
+    .mascot{
+      font-size:36px; transform:translateY(-2px);
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12));
+      transition: transform .25s;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:14px;
+      padding:22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      position:relative;
+      overflow:visible;
+    }
+
+    .progress-wrap{height:10px;background:#f3f3f3;border-radius:999px;margin-bottom:16px;overflow:hidden;box-shadow:inset 0 -2px 6px rgba(0,0,0,0.03)}
+    .progress{height:100%;width:0%;background:linear-gradient(90deg,#ffd46b,#ff8a65);transition:width .45s ease}
+
+    #metaRow{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    #qnum{font-weight:700;color:#4a2b0f}
+    #score{font-size:13px;color:#3d3d3d}
+
+    #question{font-size:20px;margin:6px 0 14px;color:#2f2f2f;min-height:50px}
+
+    #options{display:flex;flex-direction:column;gap:10px}
+    .opt-btn{
+      background: linear-gradient(180deg,#fffbe6,#fff1d6);
+      border:2px solid rgba(0,0,0,0.03);
+      padding:12px 14px;border-radius:10px;font-size:15px;font-weight:700;
+      cursor:pointer;text-align:left;box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+      transition: transform .12s ease, box-shadow .12s, background .15s;
+      display:flex;align-items:center;gap:12px;
+    }
+    .opt-btn:hover{ transform:translateY(-4px) }
+    .opt-btn.disabled{ opacity:0.55; cursor:not-allowed; transform:none; box-shadow:none; }
+    .opt-btn.correct{ background:linear-gradient(180deg,#4caf50,#3d9b4a); color:white; box-shadow:0 14px 30px rgba(76,175,80,0.18)}
+    .opt-btn.wrong{ background:linear-gradient(180deg,#ffd6d6,#ffc4c4); border-color:rgba(217,83,79,0.35); color:#6b2a2a; }
+
+    .row{
+      display:flex;align-items:center;gap:10px;margin-top:12px;justify-content:space-between;
+    }
+
+    #message{font-weight:800;color:var(--good);min-height:22px}
+    #message.bad{ color:var(--bad) }
+
+    .confetti{ position:absolute; inset:0; pointer-events:none; overflow:visible; z-index:30; }
+
+    /* confetti piece */
+    .confetti-piece{
+      position:absolute; width:10px; height:14px; opacity:0.95; border-radius:2px;
+      transform-origin:center;
+      animation: conf-fall linear forwards;
+    }
+    @keyframes conf-fall {
+      0% { transform: translateY(-20px) rotate(0deg) scale(1); opacity:1; }
+      100% { transform: translateY(420px) rotate(720deg) scale(.8); opacity:0; }
+    }
+
+    .footer{ display:flex; justify-content:space-between; align-items:center; margin-top:16px; gap:10px; flex-wrap:wrap;}
+    .small{ font-size:13px;color:#6b6b6b }
+    .restart{
+      background:#fff; border:2px dashed rgba(0,0,0,0.08); padding:8px 12px;border-radius:9px; cursor:pointer;
+      box-shadow: none; font-weight:800;
+    }
+
+    /* responsive */
+    @media (max-width:520px){
+      .card{padding:16px}
+      .title{font-size:16px}
+      .mascot{font-size:28px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="title">Java OOP & DSA — Fun Quiz <span style="font-size:18px">🎯</span></div>
+        <div class="subtitle">Moderate-level questions — keep trying till you get it right!</div>
+      </div>
+      <div id="mascot" class="mascot" title="Cheerful helper">😜</div>
+    </div>
+
+    <div class="card" role="main" aria-live="polite">
+      <div class="progress-wrap" aria-hidden="true"><div id="progress" class="progress"></div></div>
+
+      <div id="metaRow">
+        <div id="qnum">Q 1 / 30</div>
+        <div id="score">Correct: 0 | Attempts: 0</div>
+      </div>
+
+      <div id="question">Loading questions...</div>
+      <div id="options" role="list"></div>
+
+      <div class="row">
+        <div id="message" aria-atomic="true"></div>
+        <div class="small">Tip: wrong answer greys out — keep trying till correct! 🇮🇳</div>
+      </div>
+
+      <div class="footer">
+        <div class="small">Made with ☕ and ❤️ — debug me if needed</div>
+        <button id="restart" class="restart" hidden>Play Again</button>
+      </div>
+
+      <div class="confetti" id="confetti" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <script>
+    // ====== QUESTIONS (30 moderate-level items) ======
+    const questions = [
+      { q: "What does OOP stand for in Java?", opts:["Object-Oriented Programming","Operational Object Programming","Organized Oriented Programming","Oriented Operational Programming"], ans:"Object-Oriented Programming" },
+      { q: "What is a class in Java?", opts:["Blueprint for creating objects","A specific instance of an object","A method","A variable"], ans:"Blueprint for creating objects" },
+      { q: "What is polymorphism in Java?", opts:["Variable holding multiple types","Method doing different tasks based on object","Changing class structure","Breaking down methods"], ans:"Method doing different tasks based on object" },
+      { q: "What does abstraction mean in Java?", opts:["Hiding implementation, showing functionality","Removing data from class","Splitting class","Combining methods"], ans:"Hiding implementation, showing functionality" },
+      { q: "Which principle allows method overriding?", opts:["Overloading","Encapsulation","Overriding","Inheritance"], ans:"Overriding" },
+      { q: "Which keyword prevents inheritance in Java?", opts:["static","final","abstract","private"], ans:"final" },
+      { q: "Purpose of 'this' in Java?", opts:["Refer current instance","Create new object","Call static method","Declare variable"], ans:"Refer current instance" },
+      { q: "What does 'extends' indicate?", opts:["Extend functionality","Inherit from superclass","Marks abstract","To be extended later"], ans:"Inherit from superclass" },
+      { q: "What is encapsulation?", opts:["Reducing class size","Hiding data within class","Sharing fields","Multiple methods"], ans:"Hiding data within class" },
+      { q: "Can a class be both abstract and final?", opts:["Yes","No","Only in special cases","Only if no methods"], ans:"No" },
+
+      { q: "Time complexity to search in a balanced BST?", opts:["O(n)","O(n log n)","O(log n)","O(1)"], ans:"O(log n)" },
+      { q: "Which algorithm detects cycles in a directed graph?", opts:["Kruskal","Dijkstra","Depth-First Search","Prim"], ans:"Depth-First Search" },
+      { q: "Ideal time complexity for hash table insert (average)?", opts:["O(n)","O(log n)","O(1)","O(n log n)"], ans:"O(1)" },
+      { q: "QuickSort worst-case time complexity?", opts:["O(n log n)","O(n^2)","O(log n)","O(n^2 log n)"], ans:"O(n^2)" },
+      { q: "Which sorting algorithm is not stable by default?", opts:["Insertion Sort","Merge Sort","Quick Sort","Bubble Sort"], ans:"Quick Sort" },
+      { q: "Best sorting algorithm when data is nearly sorted?", opts:["Quick Sort","Heap Sort","Merge Sort","Insertion Sort"], ans:"Insertion Sort" },
+      { q: "Which sort performs well when many elements are identical?", opts:["Insertion Sort","Heap Sort","Merge Sort","Selection Sort"], ans:"Insertion Sort" },
+      { q: "Which data structure is used for BFS traversal?", opts:["Stack","Queue","Priority Queue","HashMap"], ans:"Queue" },
+      { q: "QuickSort worst-case recurrence relation is:", opts:["T(n) = 2T(n/2)+O(n)","T(n) = T(n-1)+O(n)","T(n) = T(n/10)+T(9n/10)+O(n)","T(n) = T(n-2)+O(n)"], ans:"T(n) = T(n-1)+O(n)" },
+      { q: "Which approach is suitable when memory is tight for large data (external sorting)?", opts:["Heap Sort","Merge Sort (external)","Quick Sort","Insertion Sort"], ans:"Merge Sort (external)" },
+
+      { q: "Structure commonly used for parentheses matching?", opts:["Queue","Stack","Tree","Graph"], ans:"Stack" },
+      { q: "Default value of an int array element in Java?", opts:["0","null","1","-1"], ans:"0" },
+      { q: "Which access modifier allows access from anywhere?", opts:["private","default","public","protected"], ans:"public" },
+      { q: "Which hides data and methods together?", opts:["Inheritance","Polymorphism","Encapsulation","Abstraction"], ans:"Encapsulation" },
+      { q: "Which keyword prevents method overriding?", opts:["static","final","abstract","private"], ans:"final" },
+      { q: "Interface in Java is usually:", opts:["Concrete class","Only abstract methods & constants","Class with static methods","Method without body"], ans:"Only abstract methods & constants" },
+      { q: "Purpose of 'super' keyword?", opts:["Call superclass constructor","Refer parent object","Both a & b","Declare superior variable"], ans:"Both a & b" },
+      { q: "Main pillars of OOP?", opts:["Encapsulation, Inheritance, Polymorphism, Abstraction","Class, Object, Methods, Variables","Syntax, Semantics","Functions, Modules"], ans:"Encapsulation, Inheritance, Polymorphism, Abstraction" },
+      { q: "Can an interface have a constructor?", opts:["Yes","No","Only abstract","Only if extends class"], ans:"No" },
+      { q: "Constructor purpose in Java?", opts:["Construct variable names","Initialize object","Special variable","Method return type"], ans:"Initialize object" }
+    ];
+
+    // ====== STATE ======
+    let current = 0;
+    let correctCount = 0;
+    let totalAttempts = 0;
+
+    // ====== DOM refs ======
+    const qEl = document.getElementById('question');
+    const optsEl = document.getElementById('options');
+    const msgEl = document.getElementById('message');
+    const qnumEl = document.getElementById('qnum');
+    const scoreEl = document.getElementById('score');
+    const progressEl = document.getElementById('progress');
+    const mascotEl = document.getElementById('mascot');
+    const confettiEl = document.getElementById('confetti');
+    const restartBtn = document.getElementById('restart');
+
+    // safety if no questions
+    if(!questions || questions.length === 0){
+      qEl.innerText = "No questions found — please reload with data.";
+    } else {
+      showQuestion();
+    }
+
+    // ====== SHOW QUESTION ======
+    function showQuestion(){
+      const Q = questions[current];
+      qnumEl.innerText = `Q ${current + 1} / ${questions.length}`;
+      progressEl.style.width = `${Math.round(((current)/questions.length)*100)}%`;
+      qEl.innerText = Q.q;
+      optsEl.innerHTML = '';
+      msgEl.innerText = '';
+      msgEl.classList.remove('bad');
+
+      // create option buttons
+      Q.opts.forEach(optText => {
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.type = 'button';
+        b.innerHTML = `<span style="opacity:.9;font-weight:800">${letterFor(optText)}</span><div>${optText}</div>`;
+        b.onclick = () => onOptionClick(b, optText, Q.ans);
+        optsEl.appendChild(b);
+      });
+
+      // update score display
+      scoreEl.innerText = `Correct: ${correctCount} | Attempts: ${totalAttempts}`;
+      restartBtn.hidden = true;
+      mascotEl.style.transform = 'translateY(0)';
+    }
+
+    // small prefix for options: A / B / C etc (based on index)
+    function letterFor(text){
+      // not important for exact letters, simple A/B/C map by order
+      const all = Array.from(document.querySelectorAll('#options .opt-btn'));
+      const idx = all.length; // not reliable here; so we'll skip letter generation per item
+      return ''; // keep blanks to avoid complexity
+    }
+
+    // ====== OPTION CLICK HANDLER ======
+    function onOptionClick(btn, chosen, correct){
+      // if already disabled, ignore
+      if(btn.disabled) return;
+
+      // WRONG ANSWER
+      if(chosen !== correct){
+        totalAttempts++;
+        btn.classList.add('wrong');
+        btn.classList.add('disabled');
+        btn.disabled = true;
+        msgEl.innerText = "Arre yaar — Galat! Try again.";
+        msgEl.classList.add('bad');
+        mascotEl.innerText = "😅";
+        updateScoreDisplay();
+        return;
+      }
+
+      // CORRECT ANSWER
+      totalAttempts++;
+      correctCount++;
+      btn.classList.add('correct');
+      btn.disabled = true;
+
+      // disable all other buttons to avoid spam clicks
+      document.querySelectorAll('#options .opt-btn').forEach(b=>{
+        b.disabled = true;
+        if(!b.classList.contains('correct') && !b.classList.contains('wrong')) b.classList.add('disabled');
+      });
+
+      msgEl.innerText = "Bilkul Sahi! Wah bhai wah 🎉";
+      msgEl.classList.remove('bad');
+      mascotEl.innerText = "🤩";
+      updateScoreDisplay();
+      launchConfetti();
+
+      // progress update then move to next Q
+      progressEl.style.width = `${Math.round(((current+1)/questions.length)*100)}%`;
+
+      setTimeout(()=> {
+        current++;
+        if(current < questions.length){
+          showQuestion();
+        } else {
+          // finished
+          qEl.innerText = "Quiz poora ho gaya! Shabash 🚀";
+          optsEl.innerHTML = '';
+          msgEl.innerText = `You answered ${correctCount}/${questions.length} correctly with ${totalAttempts} attempts.`;
+          mascotEl.innerText = "🏆";
+          restartBtn.hidden = false;
+          progressEl.style.width = `100%`;
+        }
+      }, 900);
+    }
+
+    function updateScoreDisplay(){
+      scoreEl.innerText = `Correct: ${correctCount} | Attempts: ${totalAttempts}`;
+    }
+
+    // ====== CONFETTI: lightweight DOM pieces + CSS animation ======
+    // inspired by tutorials for simple confetti using DOM + CSS. (small, no libs) :contentReference[oaicite:2]{index=2}
+    function launchConfetti(){
+      const count = 28;
+      for(let i=0;i<count;i++){
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        const left = Math.random() * 100;
+        const size = 6 + Math.random() * 12;
+        piece.style.left = left + '%';
+        piece.style.width = size + 'px';
+        piece.style.height = Math.round(size * 1.2) + 'px';
+        piece.style.background = `hsl(${Math.random()*360}, 70%, 60%)`;
+        piece.style.top = (10 + Math.random()*10) + '%';
+        piece.style.animationDuration = (900 + Math.random()*800) + 'ms';
+        piece.style.opacity = 0.95;
+        confettiEl.appendChild(piece);
+        // remove after animation
+        piece.addEventListener('animationend', () => piece.remove());
+      }
+    }
+
+    // ====== RESTART ======
+    restartBtn.addEventListener('click', ()=>{
+      current = 0; correctCount = 0; totalAttempts = 0;
+      showQuestion();
+    });
+
+    // Extra: if console shows any error, copy it and tell me — I'll fix fast
+    // NOTE: if something still breaks, open DevTools (F12) and paste the error here.
+  </script>
+</body>
+</html>
